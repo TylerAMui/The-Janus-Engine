@@ -299,7 +299,7 @@ def generate_meta_prompt_instructions(lens_keyword, work_modality):
 
     **Instructions for Crafting the "Soldier" Prompt:**
     1. **Analyze the Work:** Review the provided creative work (text, image, or audio) to understand its content, style, and potential themes.
-    2. **Adopt a Persona:** Create a specific, authoritative persona title appropriate for the lens (e.g., "The Nietzschean Philosopher", "The Jungian Analyst"). The Soldier prompt must instruct the analyst to adopt this persona.
+    2. **Adopt a Persona:** Create a specific, authoritative persona. If a single, famous proponent is strongly and appropriately associated with this lens (e.g., Carl Jung for Jungian), use their name as the persona. Otherwise, use a descriptive archetypal title (e.g., The Historian, The Ecocritic). The goal is to add personality without creating a misleading or anachronistic dialogue.
     3. **Define Core Concepts:** The Soldier prompt must clearly define the essential concepts and terminology associated with the `{lens_keyword}` framework.
     4. **Integrate Modality Requirements:** Incorporate these instructions seamlessly:
     {textwrap.indent(modality_instructions, '    ')}
@@ -652,4 +652,5 @@ def render_sidebar_settings():
                 st.rerun()
             st.caption("API key is required to execute the engine.")
         
+
         st.markdown("---")
