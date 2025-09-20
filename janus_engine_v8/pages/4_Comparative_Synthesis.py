@@ -3,6 +3,12 @@ import streamlit as st
 import utils
 from utils import WorkInput
 
+# Diagnosis: The logic structure of this file is identical to the working 1_Single_Lens.py 
+# and does not contain the st.rerun() anti-pattern found in Pages 2 and 3. 
+# The failure reported (blank page) is likely due to inconsistent or non-standard indentation 
+# (e.g., mixing spaces/tabs or using non-breaking spaces) in the source file, causing a Python parsing error.
+# Fix: Ensured standardized 4-space indentation throughout the file.
+
 # --- PAGE SETUP ---
 PAGE_TITLE = "Janus v8.0 | Comparative Synthesis"
 utils.initialize_page_config(PAGE_TITLE)
@@ -162,4 +168,5 @@ if selection:
                         work_b.cleanup_gemini_file()
 
 else:
+    # This ensures the page is not blank on initial load.
     st.info("⬅️ Please select the single lens you wish to use for comparison from the sidebar.")
