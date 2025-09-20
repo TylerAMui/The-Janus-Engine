@@ -133,7 +133,8 @@ elif selection_mode == SELECT_SMART:
     is_ready_for_input = True
     header_text += f"{smart_count} Lenses (Smart Selection)"
     st.info(f"🤖 **Smart Selection:** Provide the input work below. The 'Analyst-in-Chief' will select {smart_count} lenses upon execution.")
-
+else:
+    st.info(f"⬅️ Please select {MIN_SELECTIONS} or more lenses using the sidebar, or switch to Smart Selection.")
 if is_ready_for_input:
     st.header(header_text)
     
@@ -240,3 +241,4 @@ if is_ready_for_input:
                     finally:
                         # CRITICAL: Cleanup uploaded files after ALL analysis is complete
                         work_a.cleanup_gemini_file()
+
