@@ -4,14 +4,22 @@ import utils
 from lenses import get_filtered_lenses
 from utils import WorkInput, SELECT_MANUAL, SELECT_SMART, SELECTION_MODES
 
+# Constants for this mode
+MIN_SELECTIONS = 3
+
+# --- CALLBACKS ---
+# Diagnosis: Similar to Page 2, this page used the manual st.rerun() pattern in the sidebar.
+# Fix: Replaced with the idiomatic on_change callback pattern for robust state synchronization.
+
+def handle_symposium_mode_change():
+    """Callback to clear selections when the mode changes."""
+    st.session_state.symposium_selection = []
+
 # --- PAGE SETUP ---
 PAGE_TITLE = "Janus v8.0 | Symposium"
 utils.initialize_page_config(PAGE_TITLE)
 st.title("3 | Symposium (3+ Lenses)")
 st.write("Analyze ONE work through THREE or more lenses, synthesized into a discussion.")
-
-# Constants for this mode
-MIN_SELECTIONS = 3
 
 # --- SIDEBAR ---
 utils.render_sidebar_settings()
@@ -19,8 +27,11 @@ utils.render_sidebar_settings()
 # Initialize Session State for this page
 if 'symposium_selection' not in st.session_state:
     st.session_state.symposium_selection = []
+
+# Initialize the selection mode. This key is the single source of truth.
 if 'symposium_selection_mode' not in st.session_state:
     st.session_state.symposium_selection_mode = SELECT_MANUAL
+
 if 'symposium_smart_count' not in st.session_state:
     # Default count for Smart Selection
     st.session_state.symposium_smart_count = 3 
@@ -35,20 +46,16 @@ with st.sidebar:
     st.subheader("🔬 Lens Selection")
 
     # v8.0 Feature: Smart Selection Toggle
-    selection_mode = st.radio(
+    # Replaced manual comparison and st.rerun() with the idiomatic pattern.
+    st.radio(
         "Selection Method:",
         SELECTION_MODES,
-        index=SELECTION_MODES.index(st.session_state.symposium_selection_mode), # Reflect current state
-        key="symposium_selection_mode_radio"
+        # Index is handled automatically based on the key's initialized state.
+        key="symposium_selection_mode",
+        on_change=handle_symposium_mode_change
     )
     
-    # Update session state if the radio changes
-    if selection_mode != st.session_state.symposium_selection_mode:
-        st.session_state.symposium_selection_mode = selection_mode
-        # Clear selections when switching modes
-        st.session_state.symposium_selection = []
-        # Rerun to ensure UI updates correctly
-        st.rerun()
+    # The previous block containing the manual check and st.rerun() has been removed.
 
     if st.session_state.symposium_selection_mode == SELECT_MANUAL:
         # Render the standard Library/Workshop interface
@@ -105,10 +112,11 @@ with st.sidebar:
         )
         st.session_state.symposium_smart_count = smart_count
 
-        # Ensure selection is empty in smart mode until execution
+        # Ensure selection is empty in smart mode until execution (also handled by callback)
         st.session_state.symposium_selection = []
 
 # --- MAIN PAGE ---
+# The script now reliably reaches this point.
 
 selection_mode = st.session_state.symposium_selection_mode
 manual_selection = st.session_state.symposium_selection
@@ -127,14 +135,16 @@ if selection_mode == SELECT_MANUAL:
         header_text += f"{len(manual_selection)} Lenses (Manual)"
         st.info(f"**Manual Selection:** Ready to host a symposium between: {', '.join(manual_selection)}")
     else:
+        # This message is displayed on initial load.
         st.info(f"⬅️ Please select {MIN_SELECTIONS} or more lenses using the multi-stage selector in the sidebar, or switch to Smart Selection.")
 
 elif selection_mode == SELECT_SMART:
     is_ready_for_input = True
     header_text += f"{smart_count} Lenses (Smart Selection)"
     st.info(f"🤖 **Smart Selection:** Provide the input work below. The 'Analyst-in-Chief' will select {smart_count} lenses upon execution.")
-else:
-    st.info(f"⬅️ Please select {MIN_SELECTIONS} or more lenses using the sidebar, or switch to Smart Selection.")
+
+# Removed redundant final 'else' block.
+
 if is_ready_for_input:
     st.header(header_text)
     
@@ -237,8 +247,7 @@ if is_ready_for_input:
                                 for lens_name, analysis_text in analyses_results.items():
                                     with st.expander(f"View Raw Analysis: {lens_name}"):
                                         st.markdown(analysis_text)
-                    
+                        
                     finally:
                         # CRITICAL: Cleanup uploaded files after ALL analysis is complete
                         work_a.cleanup_gemini_file()
-
