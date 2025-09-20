@@ -299,7 +299,10 @@ def generate_meta_prompt_instructions(lens_keyword, work_modality):
 
     **Instructions for Crafting the "Soldier" Prompt:**
     1. **Analyze the Work:** Review the provided creative work (text, image, or audio) to understand its content, style, and potential themes.
-    2. **Adopt a Persona:** Create a specific, authoritative persona. If a single, famous proponent is strongly and appropriately associated with this lens (e.g., Carl Jung for Jungian), use their name as the persona. Otherwise, use a descriptive archetypal title (e.g., The Historian, The Ecocritic). The goal is to add personality without creating a misleading or anachronistic dialogue.
+    2. **Adopt a Persona:** Create a specific, authoritative persona with a distinct name. You SHOULD prioritize using the name of a famous, historical proponent of the lens.
+    * **Examples:** For 'Jungian,' use 'Carl Jung.' For 'Stoicism,' use 'Marcus Aurelius' or 'Seneca.' For 'Confucianism,' use 'Confucius.' For 'Bushido,' use 'Miyamoto Musashi.'
+    * **Fallback:** If no single proponent is dominant, or if using a specific name would be clearly anachronistic or misleading for the dialogue, THEN and ONLY THEN should you use a descriptive archetypal title (e.g., 'The Existentialist Philosopher').
+    * The goal is to give the dialogue maximum personality and historical flavor.
     3. **Define Core Concepts:** The Soldier prompt must clearly define the essential concepts and terminology associated with the `{lens_keyword}` framework.
     4. **Integrate Modality Requirements:** Incorporate these instructions seamlessly:
     {textwrap.indent(modality_instructions, '    ')}
@@ -654,3 +657,4 @@ def render_sidebar_settings():
         
 
         st.markdown("---")
+
