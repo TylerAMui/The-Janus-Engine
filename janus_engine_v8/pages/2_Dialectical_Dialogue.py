@@ -3,6 +3,16 @@ import streamlit as st
 import utils
 from utils import WorkInput, SELECT_MANUAL, SELECT_SMART, SELECTION_MODES
 
+# --- CALLBACKS ---
+# Diagnosis: The original code used st.rerun() in the sidebar to synchronize state changes.
+# This is an anti-pattern that causes the script execution to halt prematurely, resulting in a blank page.
+# Fix: We use the idiomatic Streamlit pattern: an on_change callback to handle side effects (clearing selections).
+
+def handle_dialectical_mode_change():
+    """Callback to clear selections when the mode changes."""
+    # This runs after the state key is updated but before the script reruns.
+    st.session_state.dialectical_selection = []
+
 # --- PAGE SETUP ---
 PAGE_TITLE = "Janus v8.0 | Dialectical Dialogue"
 utils.initialize_page_config(PAGE_TITLE)
@@ -13,9 +23,10 @@ st.write("Analyze ONE work through TWO lenses, synthesized into a dialogue (Thes
 utils.render_sidebar_settings()
 
 # Initialize Session State for this page
-# We use specific keys for this page to maintain state when switching pages
 if 'dialectical_selection' not in st.session_state:
     st.session_state.dialectical_selection = []
+
+# Initialize the selection mode. This key is the single source of truth, managed by the widget.
 if 'dialectical_selection_mode' not in st.session_state:
     st.session_state.dialectical_selection_mode = SELECT_MANUAL
 
@@ -29,20 +40,16 @@ with st.sidebar:
     st.subheader("🔬 Lens Selection")
 
     # v8.0 Feature: Smart Selection Toggle
-    selection_mode = st.radio(
+    # Replaced manual comparison and st.rerun() with the idiomatic pattern.
+    st.radio(
         "Selection Method:",
         SELECTION_MODES,
-        index=SELECTION_MODES.index(st.session_state.dialectical_selection_mode), # Reflect current state
-        key="dialectical_selection_mode_radio"
+        # Index is handled automatically based on the key's initialized state.
+        key="dialectical_selection_mode", 
+        on_change=handle_dialectical_mode_change
     )
-    # Update session state if the radio changes
-    if selection_mode != st.session_state.dialectical_selection_mode:
-        st.session_state.dialectical_selection_mode = selection_mode
-        # Clear selections when switching modes to avoid confusion
-        st.session_state.dialectical_selection = []
-        # Rerun to ensure UI updates correctly
-        st.rerun()
-
+    
+    # The previous block containing the manual check and st.rerun() has been removed.
 
     if st.session_state.dialectical_selection_mode == SELECT_MANUAL:
         # Render the standard Library/Workshop interface
@@ -114,10 +121,11 @@ with st.sidebar:
     
     elif st.session_state.dialectical_selection_mode == SELECT_SMART:
         st.info("🤖 **Smart Selection Activated.** The Janus 'Analyst-in-Chief' will choose the two most potent lenses after analyzing your input.")
-        # Ensure selection is empty in smart mode until execution
+        # Ensure selection is empty in smart mode until execution (also handled by callback)
         st.session_state.dialectical_selection = []
 
 # --- MAIN PAGE ---
+# The script now reliably reaches this point because st.rerun() is no longer used.
 
 selection_mode = st.session_state.dialectical_selection_mode
 manual_selection = st.session_state.dialectical_selection
@@ -135,12 +143,15 @@ if selection_mode == SELECT_MANUAL:
         header_text += f"{manual_selection[0]} vs. {manual_selection[1]}"
         st.info(f"**Manual Selection:** Ready to synthesize **{manual_selection[0]}** (Thesis) and **{manual_selection[1]}** (Antithesis).")
     else:
+        # This message is displayed on initial load.
         st.info("⬅️ Please select Lens A (Thesis) and Lens B (Antithesis) using the selectors in the sidebar, or switch to Smart Selection.")
 
 elif selection_mode == SELECT_SMART:
     is_ready_for_input = True
     header_text += "Smart Selection"
     st.info("🤖 **Smart Selection:** Provide the input work below. The 'Analyst-in-Chief' will select the lenses upon execution.")
+
+# Removed redundant final 'else' block as conditions above cover all required states.
 
 if is_ready_for_input:
     st.header(header_text)
