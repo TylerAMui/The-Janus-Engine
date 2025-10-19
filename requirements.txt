@@ -1,3 +1,18 @@
-streamlit
-google-generativeai
-Pillow
+# Janus Engine - Requirements
+# Literary Analysis Engine using Google's Gemini API
+#
+# Version Strategy: Using compatible release (~=) for stability with security patches
+# - Allows patch-level updates (e.g., 1.39.0 -> 1.39.1)
+# - Blocks minor/major version changes that could break compatibility
+
+# Web Framework
+streamlit~=1.39.0
+
+# Google Gemini API
+google-genai~=0.8.0
+
+# Data Validation
+pydantic~=2.10.0
+
+# Data Display (Lens Library)
+pandas~=2.2.0
